@@ -1,0 +1,260 @@
+// ConsoleApplication40.cpp : Este archivo contiene la función "main". La ejecución del programa comienza y termina ahí.
+//
+
+#include <iostream>
+#include <ctime> 
+#include <string>
+
+using namespace std;
+
+class Carta
+{
+public:
+    string elemento;
+    int poder;
+
+    Carta(string elemento = "", int poder = 0) : elemento(elemento), poder(poder) {}
+
+    void mostrar() const {
+        cout << elemento << " (Poder: " << poder << ")\n";
+    }
+};
+
+class Jugador
+{
+public:
+    Carta mano[5];
+    int numCartas;
+
+    Jugador() : numCartas(0) {}
+
+    void agregarCarta(const Carta& carta)
+    {
+        if (numCartas < 5)
+        {
+            mano[numCartas++] = carta;
+        }
+    }
+
+    Carta seleccionarCartaJugador()
+    {
+        cout << "Selecciona una carta de tu mano:\n";
+        for (int i = 0; i < numCartas; ++i)
+        {
+            cout << i + 1 << ". ";
+            mano[i].mostrar();
+        }
+        int opcion;
+        do
+        {
+            cout << "Ingresa el numero de la carta que deseas jugar: ";
+            cin >> opcion;
+        } while (opcion < 1 || opcion > numCartas);
+
+        Carta cartaSeleccionada = mano[opcion - 1];
+        for (int i = opcion - 1; i < numCartas - 1; ++i)
+        {
+            mano[i] = mano[i + 1];
+        }
+        numCartas--;
+        return cartaSeleccionada;
+    }
+
+    Carta seleccionarCartaOrdenador()
+    {
+        int indice = rand() % numCartas; // Seleccion aleatoria 
+        Carta cartaSeleccionada = mano[indice];
+        for (int i = indice; i < numCartas - 1; ++i)
+        {
+            mano[i] = mano[i + 1];
+        }
+        numCartas--;
+        return cartaSeleccionada;
+    }
+};
+
+class JuegoCardJitsu
+{
+private:
+    Carta mazo[30];
+    int numCartas;
+    Jugador jugador;
+    Jugador Neymar;
+    int rondasJugador;
+    int rondasNeymar;
+
+public:
+    JuegoCardJitsu() : numCartas(30), rondasJugador(0), rondasNeymar(0)
+    {
+        srand(time(NULL)); // Esta funcion crea la aleatoriedad
+        crearMazo();
+        barajarMazo();
+        repartirCartas();
+    }
+
+    void crearMazo()
+    {
+        string elementos[] = { "Fuego", "Agua", "Nieve" };
+        int index = 0;
+        for (const string& elemento : elementos)
+        {
+            for (int poder = 1; poder <= 10; poder++)
+            {
+                mazo[index++] = Carta(elemento, poder);
+            }
+        }
+    }
+    void barajarMazo()
+    {
+        for (int i = numCartas - 1; i > 0; --i)
+        {
+            int j = rand() % (i + 1); // Generar índice aleatorio
+
+            // Intercambiar mazo[i] y mazo[j] 
+            Carta temp = mazo[i];
+            mazo[i] = mazo[j];
+            mazo[j] = temp;
+        }
+    }
+
+    void repartirCartas()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            jugador.agregarCarta(mazo[--numCartas]);
+            Neymar.agregarCarta(mazo[--numCartas]);
+        }
+    }
+
+    int determinarGanador(const Carta& cartaJugador, const Carta& cartaNeymar)
+    {
+        if (cartaJugador.elemento == cartaNeymar.elemento)
+        {
+            if (cartaJugador.poder > cartaNeymar.poder)
+            {
+                return 1;
+            }
+
+            else if (cartaJugador.poder < cartaNeymar.poder)
+            {
+                return -1;
+            }
+
+            else
+            {
+                return 0;
+            }
+        }
+        else if ((cartaJugador.elemento == "Fuego" && cartaNeymar.elemento == "Nieve") || (cartaJugador.elemento == "Nieve" && cartaNeymar.elemento == "Agua") || (cartaJugador.elemento == "Agua" && cartaNeymar.elemento == "Fuego"))
+        {
+            return 1;
+        }
+
+        else
+        {
+            return -1;
+        }
+    }
+    void reponerCarta(Jugador& jugador)
+    {
+        if (numCartas > 0)
+        {
+            jugador.agregarCarta(mazo[--numCartas]);
+        }
+    }
+
+    void jugar()
+    {
+        cout << "=== BIENVENIDO A CARD-JITSU (Mejor de tres) ===\n\n";
+
+        int rondaActual = 1;
+
+        while (rondaActual <= 3)
+        {
+            cout << "=== Ronda " << rondaActual << " ===\n";
+
+            Carta cartaJugador = jugador.seleccionarCartaJugador();
+            cout << "Tu carta seleccionada: ";
+            cartaJugador.mostrar();
+
+            Carta cartaComputadora = Neymar.seleccionarCartaOrdenador();
+            cout << "Carta de Neymar: ";
+            cartaComputadora.mostrar();
+
+            int resultado = determinarGanador(cartaJugador, cartaComputadora);
+
+
+            if (resultado == 1)
+            {
+                cout << "Ganaste esta ronda!\n";
+                rondasJugador++;
+            }
+
+            else if (resultado == -1)
+            {
+                cout << "Neymar gana esta ronda.\n";
+                rondasNeymar++;
+            }
+
+            else
+            {
+                cout << "Esta ronda es un empate.\n";
+            }
+
+            cout << "Puntuacion: Jugador " << rondasJugador << " - " << rondasNeymar << " Neymar\n";
+
+            reponerCarta(jugador);
+            reponerCarta(Neymar);
+
+            if (rondasJugador == 2)
+            {
+                cout << "\nFelicidades!! Ganaste el juego de Card-Jitsu.\n";
+                break;
+            }
+
+            else if (rondasNeymar == 2)
+            {
+                cout << "\nNeymar gano el juego de Card-Jitsu.\n";
+                break;
+            }
+
+            rondaActual++;
+            cout << "=======================\n\n";
+        }
+
+        if (rondaActual > 3 && rondasJugador < 2 && rondasNeymar < 2)
+        {
+            cout << "\nEl juego termina en empate.\n";
+        }
+    }
+};
+
+
+
+
+
+int main()
+{
+    JuegoCardJitsu juego;
+    juego.jugar();
+
+    cout << "   _~_   \n";
+    cout << "  (o o)  \n";
+    cout << " /  V  \\ \n";
+    cout << "/(  _  )\\\n";
+    cout << "  ^^ ^^  \n";
+
+    cout << "Premio: Un pinguino\n";
+
+}
+
+
+// Ejecutar programa: Ctrl + F5 o menú Depurar > Iniciar sin depurar
+// Depurar programa: F5 o menú Depurar > Iniciar depuración
+
+// Sugerencias para primeros pasos: 1. Use la ventana del Explorador de soluciones para agregar y administrar archivos
+//   2. Use la ventana de Team Explorer para conectar con el control de código fuente
+//   3. Use la ventana de salida para ver la salida de compilación y otros mensajes
+//   4. Use la ventana Lista de errores para ver los errores
+//   5. Vaya a Proyecto > Agregar nuevo elemento para crear nuevos archivos de código, o a Proyecto > Agregar elemento existente para agregar archivos de código existentes al proyecto
+//   6. En el futuro, para volver a abrir este proyecto, vaya a Archivo > Abrir > Proyecto y seleccione el archivo .sln

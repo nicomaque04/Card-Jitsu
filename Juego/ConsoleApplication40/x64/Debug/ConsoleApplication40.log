@@ -1,0 +1,3 @@
+﻿  ConsoleApplication40.cpp
+D:\UNI\Programacion 2\Codigo final Nicolas Maqueda y Xavi Cristofol\Codigo final Nicolas Maqueda y Xavi Cristofol\ConsoleApplication40\ConsoleApplication40.cpp(89,19): warning C4244: 'argumento': conversión de 'time_t' a 'unsigned int'; posible pérdida de datos
+  ConsoleApplication40.vcxproj -> D:\UNI\Programacion 2\Codigo final Nicolas Maqueda y Xavi Cristofol\Codigo final Nicolas Maqueda y Xavi Cristofol\x64\Debug\ConsoleApplication40.exe
